@@ -4,24 +4,24 @@ on:
     branches:
       - main
 
-env:
-  GO_VERSION: 1.15
-
 jobs:
   test:
     name: unit test
     runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        go: ["1.15", "1.14"]
     steps:
-    - name: Set up Go
-      uses: actions/setup-go@v1
-      with:
-        go-version: ${GO_VERSION}
+      - name: Set up Go ${{matrix.go}}
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{matrix.go}}
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v1
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
 
-    - name: Get dependencies
-      run: go mod download
+      - name: Get dependencies
+        run: go mod download
 
-    - name: Test code
-      run: go test -v ./...
+      - name: Test code
+        run: go test -v ./...
