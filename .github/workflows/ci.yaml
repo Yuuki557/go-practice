@@ -11,18 +11,18 @@ jobs:
       matrix:
         go: ["1.15"]
     steps:
-      - name: Set up Go ${{matrix.go}}
+      - name: Set up Go v${{matrix.go}}
         uses: actions/setup-go@v2
         with:
           go-version: ${{matrix.go}}
 
-      - name: Check out repotsitory
+      - name: Check out source code
         uses: actions/checkout@v1
 
-      - name: Install packages
+      - name: Install dependent packages
         run: go mod download
 
-      - name: Run test
+      - name: Run all test
         run: go test -v ./...
 
   docker-build:
@@ -31,9 +31,9 @@ jobs:
     env:
       DOCKER_IMAGE_NAME: docker-app
     steps:
-      - name: Check out repotsitory
+      - name: Check out source code
         uses: actions/checkout@v1
-        
+
       - name: Build and push docker image
         run: |
           TAG=$(echo $GITHUB_REF | grep -o "[0-9][\.].*")
