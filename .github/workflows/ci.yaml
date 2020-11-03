@@ -4,10 +4,6 @@ on:
     tags:
       - v*
 
-env:
-  DOCKER_IMAGE_NAME: docker-app
-
-
 jobs:
   test:
     runs-on: ubuntu-18.04
@@ -31,11 +27,13 @@ jobs:
 
   docker-build:
     runs-on: ubuntu-18.04
+    env:
+      DOCKER_IMAGE_NAME: docker-app
     steps:
       - name: Build and push docker image
         run: |
           docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
           TAG=$(echo $GITHUB_REF | grep -o "[0-9][\.].*")
-          DOCKER_IMAGE=${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_IMAGE_NAME }}:$TAG
+          DOCKER_IMAGE=${{ secrets.DOCKER_REGISTRY }}/${ DOCKER_IMAGE_NAME }:$TAG
           docker build -t $DOCKER_IMAGE .
           docker push $DOCKER_IMAGE
