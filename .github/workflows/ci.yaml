@@ -1,27 +1,41 @@
 name: CI
 on:
   push:
-    branches:
-      - main
+    tags:
+      - v*
+
+env:
+  DOCKER_IMAGE_NAME: docker-app
+
 
 jobs:
   test:
-    name: unit test
     runs-on: ubuntu-18.04
     strategy:
       matrix:
-        go: ["1.15", "1.14"]
+        go: ["1.15"]
     steps:
-      - name: Set up Go ${{matrix.go}}
+      - name: Set up ${{matrix.go}}
         uses: actions/setup-go@v2
         with:
           go-version: ${{matrix.go}}
 
-      - name: Check out code into the Go module directory
+      - name: Check out repotsitory
         uses: actions/checkout@v1
 
-      - name: Get dependencies
+      - name: Install packages
         run: go mod download
 
-      - name: Test code
+      - name: Run test
         run: go test -v ./...
+
+  docker-build:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Build and push docker image
+        run: |
+          docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
+          TAG=$(echo $GITHUB_REF | grep -o "[0-9][\.].*")
+          DOCKER_IMAGE=${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_IMAGE_NAME }}:$TAG
+          docker build -t $DOCKER_IMAGE .
+          docker push $DOCKER_IMAGE
