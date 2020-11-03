@@ -1,4 +1,4 @@
-module github.com/yuuki557/practice
+module github.com/Yuuki557/practice
 
 go 1.13
 
